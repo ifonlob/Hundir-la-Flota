@@ -1,7 +1,6 @@
 """TODO: Tablero 8x8. Barcos: 5 (Portaaviones), 4 (Acorazado), 3 (Submarino), 3 (Crucero), 3 (Destructor) 2 Coordenadas (letra,numero), numero: fila, letra, columna"""
 from random import randint, choice
 
-
 """
 TODO: 
 --- Funciones mínimas ---
@@ -24,6 +23,24 @@ DIRECCIONES = [
 ]
 
 TAMAÑO_TABLERO = 8
+
+AGUA = "~"
+TOCADO = "X"
+FALLO = "O"
+
+
+
+# diseño irene
+# AGUA = "~"
+# TOCADO = "X"
+# FALLO = "O"
+
+# diseño juego normal
+# AGUA = "O"
+# TOCADO = "X"
+# TOCADO y HUNDIDO = "XX"  este se puede cambiar
+
+
 
 def zona_adyacente_libre(tablero_jugador1 : list[list],fila : int, columna : int) -> bool:
     if tablero_jugador1[fila][columna] != "~":
@@ -60,7 +77,7 @@ def colocar_un_barco(tablero_jugador1: list[list], tamaño_barco : int, id_barco
                 if not zona_adyacente_libre(tablero_jugador1, fila, columna):
                     tramo_libre = False
             if tramo_libre:
-                for columna in range(inicio_barco, inicio_barco + tamaño_barco):
+                for fila in range(inicio_barco, inicio_barco + tamaño_barco):
                     tablero_jugador1[fila][columna] = id_barco
                 colocado = True
 
@@ -112,6 +129,11 @@ def disparar(tablero: list[list], coord: str, barco_id : str):
     elif coord_parsed == " ":
         pass
 
+    #TODO:
+    # if coordenada == "0" or coordenada == "x"
+    #     repite y da otra coordenada
+
+
     barco_id = coord_tablero
     coord_tablero = "X"
      
@@ -126,7 +148,7 @@ def actualizar_tablero_nuestro(tablero_jugador1, mensaje):
 
     tablero_jugador1 = [letra][numero]
 
-    # tablero_jugador2 = [
+    # tablero_jugador1 = [
     #     ["~", "~", "~", "~", "~", "~", "~", "~"],
     #     ["~", "~", "~", "~", "~", "~", "~", "~"],
     #     ["~", "~", "~", "~", "~", "~", "~", "~"],
@@ -194,7 +216,6 @@ def main():
         ["~","~","~","~","~","~","~","~"],
         ["~","~","~","~","~","~","~","~"],
         ["~","~","~","~","~","~","~","~"],
-
     ]
 
     for id_barco, tamaño_barco in barcos.items():
