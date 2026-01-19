@@ -81,16 +81,7 @@ def colocar_un_barco(tablero_jugador1: list[list], tamaño_barco : int, id_barco
                     tablero_jugador1[fila][columna] = id_barco
                 colocado = True
 
-def disparar(tablero: list[list], coord: str, barco_id : str):
-    try:
-        if len(coord) != 2:
-            raise Exception("msg")
-        elif coord[0] not in {"A", "B", "C", "D", "E", "F", "G", "H"}:
-            raise Exception("msg")
-        elif coord[1] not in {"1", "2", "3", "4", "5", "6", "7", "8"}:
-            raise Exception("msg")
-    except Exception as err:
-        print(f"[ERROR]: {err}")
+def disparar(tablero: list[list], coord: str, id_barco : str,):
 
     coord_parsed = [0, 0]
 
@@ -120,25 +111,24 @@ def disparar(tablero: list[list], coord: str, barco_id : str):
     # Barco: X
     # Agua: O
 
-    coord_tablero = tablero[coord_parsed[0]][coord_parsed[1]]
-    if coord_tablero == "~":
-        coord_tablero = "O"
-        return "AGUA"
-    elif coord_tablero == "0" or "x":
+    if tablero[coord_parsed[0]][coord_parsed[1]] == AGUA:
+        tablero[coord_parsed[0]][coord_parsed[1]] = FALLO
+        return "DISPARO AL AGUA"
+    elif tablero[coord_parsed[0]][coord_parsed[1]] == FALLO or tablero[coord_parsed[0]][coord_parsed[1]] == TOCADO:
         return "YA DISPARADO"
-    elif coord_parsed == " ":
-        pass
 
-    #TODO:
+    elif tablero[coord_parsed[0]][coord_parsed[1]] == id_barco:
+        return "TOCADO"
+    elif id_barco not in tablero[coord_parsed[0]][coord_parsed[1]]:
+        return "HUNDIDO"
+
+
+
+#TODO:
     # if coordenada == "0" or coordenada == "x"
     #     repite y da otra coordenada
 
 
-    barco_id = coord_tablero
-    coord_tablero = "X"
-     
-
-    return coordenadas_disparo
 
 
 
