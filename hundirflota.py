@@ -112,7 +112,6 @@ def disparar(tablero: list[list], coord: str, id_barco : str,):
     # Agua: O
 
     if tablero[coord_parsed[0]][coord_parsed[1]] == AGUA:
-        tablero[coord_parsed[0]][coord_parsed[1]] = FALLO
         return "DISPARO AL AGUA"
     elif tablero[coord_parsed[0]][coord_parsed[1]] == FALLO or tablero[coord_parsed[0]][coord_parsed[1]] == TOCADO:
         return "YA DISPARADO"
@@ -147,7 +146,6 @@ def actualizar_tablero_nuestro(tablero_jugador1, mensaje):
     #     ["~", "~", "~", "~", "~", "~", "~", "~"],
     #     ["~", "~", "~", "~", "~", "~", "~", "~"],
     #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
     # ]
     return tablero_jugador1
 
@@ -161,7 +159,6 @@ def actualizar_tablero_enemigo(tablero_jugador2, coordenadas_disparo, mensaje):
     tablero_jugador2[letra][numero] = accion
 
     # tablero_jugador2 = [
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
     #     ["~", "~", "~", "~", "~", "~", "~", "~"],
     #     ["~", "~", "~", "~", "~", "~", "~", "~"],
     #     ["~", "~", "~", "~", "~", "~", "~", "~"],
@@ -193,7 +190,7 @@ def main():
         ["~","~","~","~","~","~","~","~"],
         ["~","~","~","~","~","~","~","~"],
         ["~","~","~","~","~","~","~","~"],
-        ["~","~","~","~","~","~","~","~"],
+
     ]
 
     tablero_jugador2 = [
@@ -205,7 +202,7 @@ def main():
         ["~","~","~","~","~","~","~","~"],
         ["~","~","~","~","~","~","~","~"],
         ["~","~","~","~","~","~","~","~"],
-        ["~","~","~","~","~","~","~","~"],
+
     ]
 
     for id_barco, tamaño_barco in barcos.items():
