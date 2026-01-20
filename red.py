@@ -76,6 +76,105 @@ def buscar_oponente():
 
 
 
+def servidor():
+    ip = obtener_ip()
+
+    host = ip
+    puerto = 4000
+
+    #aqui hay que añadir una forma de que no empieze uno siempre, o no dado k el host es aleatorio de momento
+    mi_turno = True
+    partida_activa = True
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((host, puerto))
+        s.listen(1)
+        print("Esperando jugador...")
+
+        conn, addr = s.accept()
+        print("Conectado:", addr)
+
+        with conn:
+            while partida_activa:
+                if mi_turno:
+                    disparo = input("Tu disparo (ej A,1): ")
+                    mensaje = f"disparo,{disparo}"
+                    conn.sendall((mensaje + "\n").encode())
+
+                    respuesta = conn.recv(1024).decode().strip()
+                    accion, resultado = respuesta.split(",")
+                    # esto hay que mirarlo para mirar la accion
+                    print("Resultado:", resultado)
+
+                    mi_turno = False
+                else:
+                    data = conn.recv(1024).decode().strip()
+                    accion, letra, numero = data.split(",")
+
+                    print(f"Disparo recibido: {letra},{numero}")
+
+                    # lógica del jeugo
+                    resultado = "agua"
+                    conn.sendall(f"respuesta,{resultado}\n".encode())
+
+                    mi_turno = True
+
+
+
+
+
+
+def cliente(rival):
+
+    ip_rival = rival[1]
+
+    HOST = ip_rival
+    PORT = 4000
+
+    mi_turno = False
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((HOST, PORT))
+        print("Conectado al servidor")
+
+        while True:
+            if mi_turno:
+                disparo = input("Tu disparo (ej A,1): ")
+                s.sendall(f"disparo,{disparo}\n".encode())
+
+                respuesta = s.recv(1024).decode().strip()
+                accion, resultado = respuesta.split(",")
+                #esto hay que mirarlo para mirar la accion
+                print("Resultado:", resultado)
+
+                mi_turno = False
+            else:
+                datos_mensaje = s.recv(1024).decode().strip()
+                accion, letra, numero = datos_mensaje.split(",")
+
+                print(f"Disparo recibido: {letra},{numero}")
+
+                #logica del juego
+                resultado = "agua"
+                s.sendall(f"respuesta,{resultado}\n".encode())
+
+                mi_turno = True
+
+
 def main():
     rival = buscar_oponente()
-    print(f"¡Conexión establecida con: {rival}!")
+    print(f"Conexión establecida con: {rival}")
+
+    print("\n")
+
+
+    #TODO mirar esto para que sea aleatorio
+    servidor()
+    # cliente(rival)
+
+
+
+
+
+if __name__ == "__main__":
+    main()
