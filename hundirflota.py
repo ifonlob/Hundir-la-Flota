@@ -1,6 +1,6 @@
 """TODO: Tablero 8x8. Barcos: 5 (Portaaviones), 4 (Acorazado), 3 (Submarino), 3 (Crucero), 3 (Destructor) 2 Coordenadas (letra,numero), numero: fila, letra, columna"""
 from random import randint, choice
-import pprint
+from pprint import pprint
 """
 TODO: 
 --- Funciones mínimas ---
