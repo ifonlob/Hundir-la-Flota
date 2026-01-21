@@ -32,38 +32,40 @@ def buscar_oponente(nombre: str, puerto: int = 4000):
     sock.settimeout(1.0)
 
     estado = "ESPERANDO"
-    oponente = None
+    soy_host = False
 
     print(f"Buscando en red... Mi IP: {obtener_ip()}")
 
 
+    # TODO [GONZALO]: Posible mejora:
     while estado == "ESPERANDO":
         msg = f"DESCUBRIR;{mi_id};{nombre}"
         sock.sendto(msg.encode(), (dir_broadcast, puerto))
 
         try:
             data, addr = sock.recvfrom(1024)
-            msg = data.decode()
             ip, _ = addr
-            partes = msg.split(";")
+            modo, otro_id, otro_nombre = data.decode().split(";")
 
-            if partes[0] == "DESCUBRIR":
-                otro_id, otro_nombre = partes[1], partes[2]
-
+            if modo == "DESCUBRIR":
                 if otro_id != mi_id and mi_id < otro_id:
-                    reply = f"ACEPTADO;{mi_id};{nombre}"
-                    sock.sendto(reply.encode(), addr)
+                    print(f"ACEPTADO: {otro_nombre}")
+
+                    sock.sendto(f"ACEPTADO;{mi_id};{nombre}".encode(), addr)
                     oponente = (otro_nombre, ip)
                     estado = "JUGANDO"
+                    soy_host = True
 
                     print(f"Aceptando a {otro_nombre}...")
+                else:
+                    print(f"Esperando respuesta {nombre}")
 
-            elif partes[0] == "ACEPTADO":
-                _, otro_id, otro_nombre = partes
+            elif modo == "ACEPTADO":
+                print(f"{otro_nombre} me ha aceptado")
+
                 oponente = (otro_nombre, ip)
                 estado = "JUGANDO"
-
-                print(f"{otro_nombre} me ha aceptado")
+                soy_host = False
 
         except socket.timeout:
             pass
@@ -72,7 +74,7 @@ def buscar_oponente(nombre: str, puerto: int = 4000):
             time.sleep(1)
 
     sock.close()
-    return oponente
+    return oponente, soy_host
 
 
 def servidor(puerto: int = 4000):
@@ -117,7 +119,7 @@ def servidor(puerto: int = 4000):
                     mi_turno = True
 
 
-def cliente(rival, puerto: int = 4000):
+def cliente(rival: tuple[str, int], puerto: int = 4000):
     mi_turno = False
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -151,19 +153,90 @@ def cliente(rival, puerto: int = 4000):
         # TODO: [GONZALO] No faltaria romper el bucle en funcion de una variable?
 
 
+# =====================================================================
+# TODO [GONZALO]: Como gran parte del codigo de Cliente y Servidor se repite, propongo una funcion comun:
+def bucle_cliente_servidor(conn, mi_turno: bool):
+    partida = True
+    try:
+        while partida:
+            if mi_turno:
+                disparo = input("Tu disparo (ej A,1): ")
+                mensaje = f"disparo,{disparo}"
+                conn.sendall((mensaje + "\n").encode())
+
+                respuesta = conn.recv(1024).decode().strip()
+                accion, resultado = respuesta.split(",")
+                # esto hay que mirarlo para mirar la accion
+                print("Resultado:", resultado)
+
+                mi_turno = False
+            else:
+                data = conn.recv(1024).decode().strip()
+                accion, letra, numero = data.split(",")
+
+                print(f"Disparo recibido: {letra},{numero}")
+
+                # lógica del jeugo
+                resultado = "agua"
+                conn.sendall(f"respuesta,{resultado}\n".encode())
+
+                mi_turno = True
+    except ConnectionResetError:  # Supuestamente esta es la excepcion de desconexion que he encontrado
+        print("\n[ERROR]: Desconexion")
+    finally:
+        print("\nFin de la conexion")
+
+
+def iServidor(puerto: int = 4000):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((obtener_ip(), puerto))
+        s.listen(1)
+        print("Esperando jugador...")
+
+        conn, addr = s.accept()
+        print("Conectado:", addr)
+
+        with conn:
+            print(f"CONECTADO: {addr}")
+            bucle_cliente_servidor(conn, True)
+
+
+def iCliente(rival: tuple[str, int], puerto: int = 4000):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s_conn:
+        print(f"CONECTADO SERVIDOR: {rival[0]} {rival[1]}")
+
+        time.sleep(1)
+        s_conn.connect((rival[1], puerto))  # rival[1] seria el host
+        bucle_cliente_servidor(s_conn, False)
+# =====================================================================
+
+
 def main():
     puerto = 4000
     nombre = "Cris"
-    print(f"Conexión establecida con: {rival}\n")
 
-    servidor()
     # cliente(rival, puerto)
+
+    nombre_rival, ip_rival, soy_el_host = buscar_oponente(nombre, puerto)
+
+    print(f"PARTIDA ENCONTRADA: {nombre} VS {nombre_rival}\n")
+
+    if soy_el_host:
+        print(f"[HOST]: {nombre} {obtener_ip()} (YO)")
+        print(f"[CLIENTE]: {nombre_rival} {ip_rival}")
+        servidor(puerto)
+        # iServidor(puerto)
+    else:
+        print(f"[HOST]: {nombre_rival} {ip_rival}")
+        print(f"[CLIENTE]: {nombre} {obtener_ip()} (YO)")
+        time.sleep(1)
+        cliente((nombre_rival, ip_rival), 4000)
+        # iCliente((nombre_rival, ip_rival), 4000)
 
     # TODO: [GONZALO]
     # Hay que hacer una estructura de ejecucion correcta, posiblemente reste nota. Ademas he simplificado diversas funciones
     # porque habia variables que solo se usaban 1 vez o se asignaban a si mismas, eso a Jose no le gusta.
 
-    oponente_info = buscar_oponente(nombre, puerto)
 
 if __name__ == "__main__":
     main()

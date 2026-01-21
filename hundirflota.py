@@ -80,7 +80,7 @@ def colocar_un_barco(tablero_jugador1: list[list], tamaño_barco : int, id_barco
                     tablero_jugador1[fila][columna] = id_barco
                 colocado = True
 
-def disparar(tablero: list[list], coord: str, id_barco : str, barcos_hundidos : list[str]) -> str:
+def disparar(tablero_jugador1: list[list], coord: str, id_barco : str, barcos_hundidos : list[str]) -> str:
 
     coord_parsed = [0, 0]
 
@@ -106,23 +106,20 @@ def disparar(tablero: list[list], coord: str, id_barco : str, barcos_hundidos : 
             coord_parsed[0] = 7
 
     while tocado:
-        if tablero[coord_parsed[0]][coord_parsed[1]] == AGUA:
+        if tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == AGUA:
             tocado = False
             return "DISPARO AL AGUA"
-        elif tablero[coord_parsed[0]][coord_parsed[1]] == FALLO or tablero[coord_parsed[0]][coord_parsed[1]] == TOCADO:
+        elif tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == FALLO or tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == TOCADO:
             tocado = False
             return "YA DISPARADO"
 
-        elif tablero[coord_parsed[0]][coord_parsed[1]] == id_barco:
-            tablero[coord_parsed[0]][coord_parsed[1]] = TOCADO
+        elif tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == id_barco:
+            tablero_jugador1[coord_parsed[0]][coord_parsed[1]] = TOCADO
             tocado = True
-            if id_barco not in tablero:
+            if id_barco not in tablero_jugador1:
                 barcos_hundidos.append(id_barco)
                 return "HUNDIDO"
             return "TOCADO"
-
-
-
 
 def main():
     barcos = {
@@ -132,8 +129,6 @@ def main():
         "4": 3,
         "5": 2
     }
-
-
 
     tablero_jugador1 = [
         ["~","~","~","~","~","~","~","~"],
@@ -161,6 +156,9 @@ def main():
 
     for id_barco, tamaño_barco in barcos.items():
         colocar_un_barco(tablero_jugador1, tamaño_barco, id_barco)
-    pprint.pprint(tablero_jugador1)
+    pprint(tablero_jugador1)
+
+
+
 if __name__ == "__main__":
     main()
