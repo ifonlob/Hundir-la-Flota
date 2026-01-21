@@ -6,25 +6,24 @@ import uuid
 
 def obtener_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
     try:
         s.connect(("8.8.8.8", 80))
         mi_ip = s.getsockname()[0]
     finally:
         s.close()
+
     return mi_ip
 
+
+# He simplificado la funcion porque todas las variables que solo se usaban 1 vez
 def calcular_broadcast():
-    ip = obtener_ip()
-    red = ipaddress.IPv4Network(ip + "/24", strict=False)
-    return str(red.broadcast_address)
+    # RED
+    return str(ipaddress.IPv4Network(obtener_ip() + "/24", strict=False).broadcast_address)
 
 
-
-def buscar_oponente():
-    puerto = 4000
-    nombre = "Cris"
+def buscar_oponente(nombre: str, puerto: int = 4000):
     mi_id = str(uuid.uuid4())
-    mi_ip = obtener_ip()
     dir_broadcast = calcular_broadcast()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -36,7 +35,7 @@ def buscar_oponente():
     estado = "ESPERANDO"
     oponente = None
 
-    print(f"Buscando en red... Mi IP: {mi_ip}")
+    print(f"Buscando en red... Mi IP: {obtener_ip()}")
 
 
     while estado == "ESPERANDO":
@@ -75,14 +74,10 @@ def buscar_oponente():
     return oponente
 
 
+def servidor(puerto: int = 4000):
+    host = obtener_ip() # ip
 
-def servidor():
-    ip = obtener_ip()
-
-    host = ip
-    puerto = 4000
-
-    #aqui hay que añadir una forma de que no empieze uno siempre, o no dado k el host es aleatorio de momento
+    #TODO: Aqui hay que añadir una forma de que no empieze uno siempre, o no dado k el host es aleatorio de momento
     mi_turno = True
     partida_activa = True
 
@@ -120,21 +115,13 @@ def servidor():
                     mi_turno = True
 
 
+def cliente(rival, puerto: int = 4000):
 
-
-
-
-def cliente(rival):
-
-    ip_rival = rival[1]
-
-    HOST = ip_rival
-    PORT = 4000
-
+    HOST = rival[1] # ip_rival
     mi_turno = False
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST, PORT))
+        s.connect((HOST, puerto))
         print("Conectado al servidor")
 
         while True:
@@ -144,7 +131,8 @@ def cliente(rival):
 
                 respuesta = s.recv(1024).decode().strip()
                 accion, resultado = respuesta.split(",")
-                #esto hay que mirarlo para mirar la accion
+
+                #TODO: Esto hay que mirarlo para mirar la accion
                 print("Resultado:", resultado)
 
                 mi_turno = False
@@ -160,20 +148,20 @@ def cliente(rival):
 
                 mi_turno = True
 
+            # TODO: [GONZALO] No faltaria romper el bucle?
+
 
 def main():
-    rival = buscar_oponente()
-    print(f"Conexión establecida con: {rival}")
-
-    print("\n")
+    puerto = 4000
+    rival = buscar_oponente("Cris", puerto)
+    print(f"Conexión establecida con: {rival}\n")
 
 
     #TODO mirar esto para que sea aleatorio
     servidor()
-    # cliente(rival)
+    # cliente(rival, puerto)
 
-
-
+    # TODO: [GONZALO] Hay que hacer una estructura de ejecucion correcta, posiblemente reste nota
 
 
 if __name__ == "__main__":

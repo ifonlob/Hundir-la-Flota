@@ -1,6 +1,6 @@
 """TODO: Tablero 8x8. Barcos: 5 (Portaaviones), 4 (Acorazado), 3 (Submarino), 3 (Crucero), 3 (Destructor) 2 Coordenadas (letra,numero), numero: fila, letra, columna"""
 from random import randint, choice
-
+import pprint
 """
 TODO: 
 --- Funciones mínimas ---
@@ -105,70 +105,19 @@ def disparar(tablero: list[list], coord: str, id_barco : str,):
             coord_parsed[0] = 7
 
 
-
-    #TODO: Implementar disparo cuando se tenga la logica de la posicion de los barcos
-    # Desconocido: ~
-    # Barco: X
-    # Agua: O
-
     if tablero[coord_parsed[0]][coord_parsed[1]] == AGUA:
         return "DISPARO AL AGUA"
     elif tablero[coord_parsed[0]][coord_parsed[1]] == FALLO or tablero[coord_parsed[0]][coord_parsed[1]] == TOCADO:
         return "YA DISPARADO"
 
     elif tablero[coord_parsed[0]][coord_parsed[1]] == id_barco:
+        tablero[coord_parsed[0]][coord_parsed[1]] = TOCADO
+        if id_barco not in tablero:
+            return "HUNDIDO"
         return "TOCADO"
-    elif id_barco not in tablero[coord_parsed[0]][coord_parsed[1]]:
-        return "HUNDIDO"
 
 
 
-#TODO:
-    # if coordenada == "0" or coordenada == "x"
-    #     repite y da otra coordenada
-
-
-
-
-
-def actualizar_tablero_nuestro(tablero_jugador1, mensaje):
-    accion, letra, numero = mensaje.split(",")
-
-
-    tablero_jugador1 = [letra][numero]
-
-    # tablero_jugador1 = [
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    # ]
-    return tablero_jugador1
-
-
-def actualizar_tablero_enemigo(tablero_jugador2, coordenadas_disparo, mensaje):
-
-    letra, numero = coordenadas_disparo.split(",")
-
-    accion, letra, numero = mensaje.split(",")
-
-    tablero_jugador2[letra][numero] = accion
-
-    # tablero_jugador2 = [
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    #     ["~", "~", "~", "~", "~", "~", "~", "~"],
-    # ]
-    return tablero_jugador2
 
 
 
@@ -207,6 +156,6 @@ def main():
 
     for id_barco, tamaño_barco in barcos.items():
         colocar_un_barco(tablero_jugador1, tamaño_barco, id_barco)
-
+    print(tablero_jugador1)
 if __name__ == "__main__":
     main()
