@@ -16,7 +16,6 @@ def obtener_ip():
     return mi_ip
 
 
-# He simplificado la funcion porque todas las variables que solo se usaban 1 vez
 def calcular_broadcast():
     # RED
     return str(ipaddress.IPv4Network(obtener_ip() + "/24", strict=False).broadcast_address)
@@ -52,17 +51,19 @@ def buscar_oponente(nombre: str, puerto: int = 4000):
                 otro_id, otro_nombre = partes[1], partes[2]
 
                 if otro_id != mi_id and mi_id < otro_id:
-                    print(f"Aceptando a {otro_nombre}...")
                     reply = f"ACEPTADO;{mi_id};{nombre}"
                     sock.sendto(reply.encode(), addr)
                     oponente = (otro_nombre, ip)
                     estado = "JUGANDO"
 
+                    print(f"Aceptando a {otro_nombre}...")
+
             elif partes[0] == "ACEPTADO":
                 _, otro_id, otro_nombre = partes
-                print(f"{otro_nombre} me ha aceptado")
                 oponente = (otro_nombre, ip)
                 estado = "JUGANDO"
+
+                print(f"{otro_nombre} me ha aceptado")
 
         except socket.timeout:
             pass
@@ -75,14 +76,15 @@ def buscar_oponente(nombre: str, puerto: int = 4000):
 
 
 def servidor(puerto: int = 4000):
-    host = obtener_ip() # ip
-
+    #TODO: Mirar que sea aleatorio
     #TODO: Aqui hay que añadir una forma de que no empieze uno siempre, o no dado k el host es aleatorio de momento
+    #TODO: [GONZALO] Esto habria que discutirlo con el otro grupo
+
     mi_turno = True
     partida_activa = True
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((host, puerto))
+        s.bind((obtener_ip(), puerto))
         s.listen(1)
         print("Esperando jugador...")
 
@@ -116,12 +118,10 @@ def servidor(puerto: int = 4000):
 
 
 def cliente(rival, puerto: int = 4000):
-
-    HOST = rival[1] # ip_rival
     mi_turno = False
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST, puerto))
+        s.connect((rival[1], puerto)) # rival[1] seria el host
         print("Conectado al servidor")
 
         while True:
@@ -142,27 +142,28 @@ def cliente(rival, puerto: int = 4000):
 
                 print(f"Disparo recibido: {letra},{numero}")
 
-                #logica del juego
                 resultado = "agua"
+                # Mirar
                 s.sendall(f"respuesta,{resultado}\n".encode())
 
                 mi_turno = True
 
-            # TODO: [GONZALO] No faltaria romper el bucle?
+        # TODO: [GONZALO] No faltaria romper el bucle en funcion de una variable?
 
 
 def main():
     puerto = 4000
-    rival = buscar_oponente("Cris", puerto)
+    nombre = "Cris"
     print(f"Conexión establecida con: {rival}\n")
 
-
-    #TODO mirar esto para que sea aleatorio
     servidor()
     # cliente(rival, puerto)
 
-    # TODO: [GONZALO] Hay que hacer una estructura de ejecucion correcta, posiblemente reste nota
+    # TODO: [GONZALO]
+    # Hay que hacer una estructura de ejecucion correcta, posiblemente reste nota. Ademas he simplificado diversas funciones
+    # porque habia variables que solo se usaban 1 vez o se asignaban a si mismas, eso a Jose no le gusta.
 
+    oponente_info = buscar_oponente(nombre, puerto)
 
 if __name__ == "__main__":
     main()

@@ -28,8 +28,7 @@ AGUA = "~"
 TOCADO = "X"
 FALLO = "O"
 
-
-
+barcos_hundidos = []
 # diseño irene
 # AGUA = "~"
 # TOCADO = "X"
@@ -81,9 +80,11 @@ def colocar_un_barco(tablero_jugador1: list[list], tamaño_barco : int, id_barco
                     tablero_jugador1[fila][columna] = id_barco
                 colocado = True
 
-def disparar(tablero: list[list], coord: str, id_barco : str,):
+def disparar(tablero: list[list], coord: str, id_barco : str, barcos_hundidos : list[str]) -> str:
 
     coord_parsed = [0, 0]
+
+    tocado = True
 
     coord_parsed[1] = int(coord[1]) - 1
     match coord[0]:
@@ -104,19 +105,21 @@ def disparar(tablero: list[list], coord: str, id_barco : str,):
         case "H":
             coord_parsed[0] = 7
 
+    while tocado:
+        if tablero[coord_parsed[0]][coord_parsed[1]] == AGUA:
+            tocado = False
+            return "DISPARO AL AGUA"
+        elif tablero[coord_parsed[0]][coord_parsed[1]] == FALLO or tablero[coord_parsed[0]][coord_parsed[1]] == TOCADO:
+            tocado = False
+            return "YA DISPARADO"
 
-    if tablero[coord_parsed[0]][coord_parsed[1]] == AGUA:
-        return "DISPARO AL AGUA"
-    elif tablero[coord_parsed[0]][coord_parsed[1]] == FALLO or tablero[coord_parsed[0]][coord_parsed[1]] == TOCADO:
-        return "YA DISPARADO"
-
-    elif tablero[coord_parsed[0]][coord_parsed[1]] == id_barco:
-        tablero[coord_parsed[0]][coord_parsed[1]] = TOCADO
-        if id_barco not in tablero:
-            return "HUNDIDO"
-        return "TOCADO"
-
-
+        elif tablero[coord_parsed[0]][coord_parsed[1]] == id_barco:
+            tablero[coord_parsed[0]][coord_parsed[1]] = TOCADO
+            tocado = True
+            if id_barco not in tablero:
+                barcos_hundidos.append(id_barco)
+                return "HUNDIDO"
+            return "TOCADO"
 
 
 
@@ -129,6 +132,8 @@ def main():
         "4": 3,
         "5": 2
     }
+
+
 
     tablero_jugador1 = [
         ["~","~","~","~","~","~","~","~"],
@@ -156,6 +161,6 @@ def main():
 
     for id_barco, tamaño_barco in barcos.items():
         colocar_un_barco(tablero_jugador1, tamaño_barco, id_barco)
-    print(tablero_jugador1)
+    pprint.pprint(tablero_jugador1)
 if __name__ == "__main__":
     main()
