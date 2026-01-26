@@ -129,7 +129,7 @@ def recibir_disparo(tablero_jugador1: list[list], coord: str, id_barco : str, ba
     coord_parsed[1] = coordenada_columna
 
     if tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == AGUA:
-        return "DISPARO AL AGUA"
+        return "AGUA"
     elif tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == FALLO or tablero_jugador1[coord_parsed[1]][coord_parsed[1]] == TOCADO:
             return "YA DISPARADO"
 
@@ -140,14 +140,25 @@ def recibir_disparo(tablero_jugador1: list[list], coord: str, id_barco : str, ba
             return "HUNDIDO"
         return "TOCADO"
 
-def paridad(tablero_jugador2 : list[list[str]]):
+def paridad(tablero_jugador2 : list[list[str]],resultado : str):
     for i in range(len(tablero_jugador2)):
         for j in range(0,len(tablero_jugador2[i])):
-            preferente = (tablero_jugador2[i] + tablero_jugador2[j]) % 2 == 0
+            preferente = (i + j) % 2 == 0
+            if preferente:
+                match resultado:
+                    case "AGUA":
+                        tablero_jugador2[i][j] = "O"
+                    case "YA DISPARADO":
+                        pass
+                    case "TOCADO":
+                        tablero_jugador2[i][j] = "X"
+                    case "HUNDIDO":
+                        tablero_jugador2[i][j] = "X"
+                    # TODO: Implementar que cuando se hunda un barco se añada la zona muerta adyacente
+
 
 
 def target():
-
 
 
 
