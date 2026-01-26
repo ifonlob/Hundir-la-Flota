@@ -140,11 +140,13 @@ def recibir_disparo(tablero_jugador1: list[list], coord: str, id_barco : str, ba
             return "HUNDIDO"
         return "TOCADO"
 
-def paridad(tablero_jugador2 : list[list[str]],resultado : str):
+def paridad(tablero_jugador2 : list[list[str]]):
     for i in range(len(tablero_jugador2)):
         for j in range(0,len(tablero_jugador2[i])):
             preferente = (i + j) % 2 == 0
-            if preferente:
+            if preferente and tablero_jugador2[i][j] == AGUA:
+                disparo = parsear_letra(j) + str(i) # Coordenada a mandar (y,x)
+                resultado = # Llamar a función servidor
                 match resultado:
                     case "AGUA":
                         tablero_jugador2[i][j] = "O"
@@ -159,7 +161,8 @@ def paridad(tablero_jugador2 : list[list[str]],resultado : str):
 
 
 def target():
-
+    hundido = False
+    while not hundido:
 
 
 
