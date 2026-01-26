@@ -235,7 +235,7 @@ def main():
 
     # cliente(rival, puerto)
 
-    nombre_rival, ip_rival, soy_el_host = buscar_oponente(nombre, puerto)
+    (nombre_rival, ip_rival), soy_el_host = buscar_oponente(nombre, puerto)
 
     print(f"PARTIDA ENCONTRADA: {nombre} VS {nombre_rival}\n")
 

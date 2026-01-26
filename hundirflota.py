@@ -5,7 +5,7 @@ from pprint import pprint
 TODO: 
 --- Funciones mínimas ---
 - colocar_barcos(tablero_jugador1 : list[list[Any]]
-- disparar(tablero,fila,col) : String --> "AGUA" , "TOCADO" o "HUNDIDO"
+- recibir_disparo(tablero,fila,col) : String --> "AGUA" , "TOCADO" o "HUNDIDO"
 
 *** A implementar ***
 - El juego se acaba cuando el contador de barcos hundidos sea igual al número de barcos a hundir.
@@ -80,46 +80,78 @@ def colocar_un_barco(tablero_jugador1: list[list], tamaño_barco : int, id_barco
                     tablero_jugador1[fila][columna] = id_barco
                 colocado = True
 
-def disparar(tablero_jugador1: list[list], coord: str, id_barco : str, barcos_hundidos : list[str]) -> str:
+def desparsear_letra(letra : str) -> int:
+    match letra:
+        case "A":
+            return 0
+        case "B":
+            return 1
+        case "C":
+            return 2
+        case "D":
+            return 3
+        case "E":
+            return 4
+        case "F":
+            return 5
+        case "G":
+            return 6
+        case "H":
+            return 7
+
+def parsear_letra(coordenada_y: int) -> str:
+    match coordenada_y:
+        case 0:
+            return "A"
+        case 1:
+            return "B"
+        case 2:
+            return "C"
+        case 3:
+            return "D"
+        case 4:
+            return "E"
+        case 5:
+            return "F"
+        case 6:
+            return "G"
+        case 7:
+            return "H"
+
+def recibir_disparo(tablero_jugador1: list[list], coord: str, id_barco : str, barcos_hundidos : list[str]) -> str:
 
     coord_parsed = [0, 0]
 
     tocado = True
 
-    coord_parsed[1] = int(coord[1]) - 1
-    match coord[0]:
-        case "A":
-            coord_parsed[0] = 0
-        case "B":
-            coord_parsed[0] = 1
-        case "C":
-            coord_parsed[0] = 2
-        case "D":
-            coord_parsed[0] = 3
-        case "E":
-            coord_parsed[0] = 4
-        case "F":
-            coord_parsed[0] = 5
-        case "G":
-            coord_parsed[0] = 6
-        case "H":
-            coord_parsed[0] = 7
+    coord_parsed[0] = int(coord[1]) - 1
+    coordenada_columna = desparsear_letra(coord[0])
+    coord_parsed[1] = coordenada_columna
 
-    while tocado:
-        if tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == AGUA:
-            tocado = False
-            return "DISPARO AL AGUA"
-        elif tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == FALLO or tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == TOCADO:
-            tocado = False
+    if tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == AGUA:
+        return "DISPARO AL AGUA"
+    elif tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == FALLO or tablero_jugador1[coord_parsed[1]][coord_parsed[1]] == TOCADO:
             return "YA DISPARADO"
 
-        elif tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == id_barco:
-            tablero_jugador1[coord_parsed[0]][coord_parsed[1]] = TOCADO
-            tocado = True
-            if id_barco not in tablero_jugador1:
-                barcos_hundidos.append(id_barco)
-                return "HUNDIDO"
-            return "TOCADO"
+    elif tablero_jugador1[coord_parsed[0]][coord_parsed[1]] == id_barco:
+        tablero_jugador1[coord_parsed[0]][coord_parsed[1]] = TOCADO
+        if id_barco not in tablero_jugador1:
+            barcos_hundidos.append(id_barco)
+            return "HUNDIDO"
+        return "TOCADO"
+
+def paridad(tablero_jugador2 : list[list[str]]):
+    for i in range(len(tablero_jugador2)):
+        for j in range(0,len(tablero_jugador2[i])):
+            preferente = (tablero_jugador2[i] + tablero_jugador2[j]) % 2 == 0
+
+
+def target():
+
+
+
+
+
 
 def main():
     barcos = {
@@ -129,6 +161,7 @@ def main():
         "4": 3,
         "5": 2
     }
+
 
     tablero_jugador1 = [
         ["~","~","~","~","~","~","~","~"],
@@ -151,13 +184,11 @@ def main():
         ["~","~","~","~","~","~","~","~"],
         ["~","~","~","~","~","~","~","~"],
         ["~","~","~","~","~","~","~","~"],
-
     ]
 
     for id_barco, tamaño_barco in barcos.items():
         colocar_un_barco(tablero_jugador1, tamaño_barco, id_barco)
     pprint(tablero_jugador1)
-
 
 
 if __name__ == "__main__":
