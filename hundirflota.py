@@ -23,22 +23,11 @@ DIRECCIONES = [
 ]
 
 TAMAÑO_TABLERO = 8
+NUM_BARCOS = 5
 
 AGUA = "~"
 TOCADO = "X"
 FALLO = "O"
-
-barcos_hundidos = []
-# diseño irene
-# AGUA = "~"
-# TOCADO = "X"
-# FALLO = "O"
-
-# diseño juego normal
-# AGUA = "O"
-# TOCADO = "X"
-# TOCADO y HUNDIDO = "XX"  este se puede cambiar
-
 
 
 def zona_adyacente_libre(tablero_jugador1 : list[list],fila : int, columna : int) -> bool:
@@ -118,9 +107,11 @@ def parsear_letra(coordenada_y: int) -> str:
         case 7:
             return "H"
 
-def recibir_disparo(tablero_jugador1: list[list], coord: str, id_barco : str, barcos_hundidos : list[str]) -> str:
+def recibir_disparo(tablero_jugador1: list[list[str]], coord: str, id_barco : str, barcos_hundidos : list[str]) -> str:
+    # TODO: ARREGLAR LÓGICA BARCOS HUNDIDOS Y AÑADIR LÓGICA FIN DE JUEGO
+
     coord_parsed = [0, 0]
-    coord_parsed[0] = int(coord[1]) - 1
+    coord_parsed[0] = int(coord[1])
     coordenada_columna = desparsear_letra(coord[0])
     coord_parsed[1] = coordenada_columna
 
@@ -136,6 +127,7 @@ def recibir_disparo(tablero_jugador1: list[list], coord: str, id_barco : str, ba
             return "HUNDIDO"
         return "TOCADO"
 
+
 def paridad(tablero_jugador2 : list[list[str]]):
     for i in range(len(tablero_jugador2)):
         for j in range(0,len(tablero_jugador2[i])):
@@ -150,7 +142,7 @@ def paridad(tablero_jugador2 : list[list[str]]):
                         pass
                     case "TOCADO":
                         tablero_jugador2[i][j] = "X"
-                    # TODO: Implementar que cuando se hunda un barco se añada la zona muerta adyacente
+                        target(tablero_jugador2,i,j)
 
 
 
@@ -162,11 +154,11 @@ def target(tablero_jugador2 : list[list[str]],fila_inicial : int,col_inicial : i
     - Cuando reciba 'HUNDIDO', llama a marcar_zona_muerta
     """
     hundido = False
-    posiciones_barco_actual = []
+    posiciones_barco_actual = [(fila_inicial, col_inicial)]
     while not hundido:
         fila_disparo, col_disparo = # TODO: LÓGICA DE LA ESTRATEGIA TARGET
 
-        coord = parsear_letra(col_disparo) + str(fila_disparo + 1)
+        coord = parsear_letra(col_disparo) + str(fila_disparo)
         resultado = ...  # Llamada a servidor con coord
 
         match resultado:
