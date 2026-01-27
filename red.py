@@ -122,35 +122,35 @@ def servidor(puerto: int = 4000):
 
 def cliente(rival: tuple[str, int], puerto: int = 4000):
     mi_turno = False
+    partida_activa = True
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((rival[1], puerto)) # rival[1] seria el host
+        s.connect((rival[1], puerto))  # rival[1] es el host
         print("Conectado al servidor")
 
-        while True:
+        while partida_activa:
             if mi_turno:
                 disparo = input("Tu disparo (ej A,1): ")
-                s.sendall(f"disparo,{disparo}\n".encode())
+                mensaje = f"disparo,{disparo}"
+                s.sendall((mensaje + "\n").encode())
 
                 respuesta = s.recv(1024).decode().strip()
                 accion, resultado = respuesta.split(",")
-
-                #TODO: Esto hay que mirarlo para mirar la accion
+                # esto hay que mirarlo para mirar la accion
                 print("Resultado:", resultado)
 
                 mi_turno = False
             else:
-                datos_mensaje = s.recv(1024).decode().strip()
-                accion, letra, numero = datos_mensaje.split(",")
+                data = s.recv(1024).decode().strip()
+                accion, letra, numero = data.split(",")
 
                 print(f"Disparo recibido: {letra},{numero}")
 
-                resultado = "agua"
-                # Mirar
+                # lógica del juego
+                resultado = "AGUA"
                 s.sendall(f"respuesta,{resultado}\n".encode())
 
                 mi_turno = True
-
         # TODO: [GONZALO] No faltaria romper el bucle en funcion de una variable?
 
 
