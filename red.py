@@ -106,18 +106,32 @@ def servidor(puerto: int = 4000):
                     # esto hay que mirarlo para mirar la accion
                     print("Resultado:", resultado)
 
-                    mi_turno = False
+                    if resultado == "tocado":
+                        mi_turno = True
+
+                        return mi_turno,resultado
+                    else:
+                        mi_turno = False
+
+                        return mi_turno,resultado
                 else:
                     data = conn.recv(1024).decode().strip()
                     accion, letra, numero = data.split(",")
-
+        
                     print(f"Disparo recibido: {letra},{numero}")
-
-                    # lógica del jeugo
-                    resultado = "AGUA"
+        
+                    # lógica del juego
+                    resultado = random.choice(tocado_agua)
                     conn.sendall(f"respuesta,{resultado}\n".encode())
-
-                    mi_turno = True
+        
+                    if resultado == "tocado":
+                        mi_turno = False
+        
+                        return mi_turno, resultado
+                    else:
+                        mi_turno = True
+        
+                        return mi_turno, resultado
 
 
 def cliente(rival: tuple[str, int], puerto: int = 4000):
@@ -131,26 +145,40 @@ def cliente(rival: tuple[str, int], puerto: int = 4000):
         while partida_activa:
             if mi_turno:
                 disparo = input("Tu disparo (ej A,1): ")
-                mensaje = f"disparo,{disparo}"
-                s.sendall((mensaje + "\n").encode())
-
+                s.sendall(f"disparo,{disparo}\n".encode())
+    
                 respuesta = s.recv(1024).decode().strip()
                 accion, resultado = respuesta.split(",")
+    
                 # esto hay que mirarlo para mirar la accion
                 print("Resultado:", resultado)
-
-                mi_turno = False
+    
+                if resultado == "tocado":
+                    mi_turno = True
+    
+                    return mi_turno, resultado
+                else:
+                    mi_turno = False
+    
+                    return mi_turno, resultado
             else:
-                data = s.recv(1024).decode().strip()
-                accion, letra, numero = data.split(",")
-
+                datos_mensaje = s.recv(1024).decode().strip()
+                accion, letra, numero = datos_mensaje.split(",")
+    
                 print(f"Disparo recibido: {letra},{numero}")
-
-                # lógica del juego
-                resultado = "AGUA"
+    
+                resultado = random.choice(tocado_agua)
+                # Mirar
                 s.sendall(f"respuesta,{resultado}\n".encode())
-
-                mi_turno = True
+    
+                if resultado == "tocado":
+                    mi_turno = False
+    
+                    return mi_turno, resultado
+                else:
+                    mi_turno = True
+    
+                    return mi_turno, resultado
         # TODO: [GONZALO] No faltaria romper el bucle en funcion de una variable?
 
 
